@@ -26,7 +26,7 @@ IF YOU HAVE A NEW BOARD, PLEASE DO NOT HESITATE TO SEND ME THE MAPPING.
 dettus@dettus.net, make sure to include "OLEDTEST" somewhere in the subject line.
 
 # RUNNING
-Just run ./oledtest.app and watch the display. It should show you two alternating bitmaps.
+Just run sudo ./oledtest.app and watch the display. It should show you two alternating bitmaps.
 If it complains about a GPIO pin -1, your sysfs mapping does not work with the OLED hat. 
 Then you have to do some rewiring. You need to find 7 GPIO pins which are free. 
 
