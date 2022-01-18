@@ -17,4 +17,5 @@
 #SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 gcc -O3 -o oledtest.app oledtest.c
-ls -l oledtest.app
+gcc -O3 -o keytest.app keytest.c
+ls -l oledtest.app keytest.app

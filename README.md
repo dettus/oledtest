@@ -21,6 +21,7 @@ Really really sorry, this is what happens when you become a maker.
 Once you changed one of the #if 0 to #if 1, you can compile it with
 
 gcc -O3 -o oledtest.app oledtest.c
+gcc -O3 -o keytest.app keytest.c
 
 IF YOU HAVE A NEW BOARD, PLEASE DO NOT HESITATE TO SEND ME THE MAPPING.
 dettus@dettus.net, make sure to include "OLEDTEST" somewhere in the subject line.
@@ -29,6 +30,8 @@ dettus@dettus.net, make sure to include "OLEDTEST" somewhere in the subject line
 Just run sudo ./oledtest.app and watch the display. It should show you two alternating bitmaps.
 If it complains about a GPIO pin -1, your sysfs mapping does not work with the OLED hat. 
 Then you have to do some rewiring. You need to find 7 GPIO pins which are free. 
+
+Or run sudo ./keytest.app and press the buttons. 
 
 
 

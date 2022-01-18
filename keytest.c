@@ -159,7 +159,6 @@ const short physicalmapping[41]={
 #define	PIN_SCLK	(physicalmapping[23])
 
 
-
 int gpio_export(int pin)
 {
 	int fd;
@@ -265,25 +264,23 @@ int gpio_pins_up()
 
 	retval=RETVAL_OK;
 	// start with the GPIO configuration
-	retval|=gpio_export(PIN_RST);	
-	retval|=gpio_export(PIN_DC);	
-	retval|=gpio_export(PIN_BL);	
-	retval|=gpio_export(PIN_CS);	
+	retval|=gpio_export(PIN_LEFT);
+	retval|=gpio_export(PIN_UP);
+	retval|=gpio_export(PIN_FIRE);
+	retval|=gpio_export(PIN_DOWN);
+	retval|=gpio_export(PIN_RIGHT);
+	retval|=gpio_export(PIN_KEY1);
+	retval|=gpio_export(PIN_KEY2);
+	retval|=gpio_export(PIN_KEY3);
 
-	retval|=gpio_direction(PIN_RST, GPIO_OUTPUT);
-	retval|=gpio_direction(PIN_DC,  GPIO_OUTPUT);
-	retval|=gpio_direction(PIN_BL,  GPIO_OUTPUT);
-	retval|=gpio_direction(PIN_CS,  GPIO_OUTPUT);
-
-
-	// continue with the SPI pins
-	retval|=gpio_export(PIN_SCLK);
-	retval|=gpio_export(PIN_MOSI);
-	retval|=gpio_export(PIN_MISO);
-	
-	retval|=gpio_direction(PIN_SCLK, GPIO_OUTPUT);
-	retval|=gpio_direction(PIN_MOSI, GPIO_OUTPUT);
-	retval|=gpio_direction(PIN_MISO, GPIO_INPUT);
+	retval|=gpio_direction(PIN_LEFT,  GPIO_INPUT);
+	retval|=gpio_direction(PIN_UP,    GPIO_INPUT);
+	retval|=gpio_direction(PIN_FIRE,  GPIO_INPUT);
+	retval|=gpio_direction(PIN_DOWN,  GPIO_INPUT);
+	retval|=gpio_direction(PIN_RIGHT, GPIO_INPUT);
+	retval|=gpio_direction(PIN_KEY1,  GPIO_INPUT);
+	retval|=gpio_direction(PIN_KEY2,  GPIO_INPUT);
+	retval|=gpio_direction(PIN_KEY3,  GPIO_INPUT);
 
 	return retval;
 }
@@ -293,159 +290,24 @@ int gpio_pins_down()
 	int retval;
 
 	retval=RETVAL_OK;
-	retval|=gpio_write(PIN_RST,0);
-	retval|=gpio_write(PIN_DC,0);
-	retval|=gpio_write(PIN_BL,0);
-	
-	retval|=gpio_unexport(PIN_RST);	
-	retval|=gpio_unexport(PIN_DC);	
-	retval|=gpio_unexport(PIN_BL);	
-	retval|=gpio_unexport(PIN_CS);	
+	retval|=gpio_unexport(PIN_LEFT);
+	retval|=gpio_unexport(PIN_UP);
+	retval|=gpio_unexport(PIN_FIRE);
+	retval|=gpio_unexport(PIN_DOWN);
+	retval|=gpio_unexport(PIN_RIGHT);
+	retval|=gpio_unexport(PIN_KEY1);
+	retval|=gpio_unexport(PIN_KEY2);
+	retval|=gpio_unexport(PIN_KEY3);
 
-	retval|=gpio_write(PIN_SCLK,0);
-	retval|=gpio_write(PIN_MOSI,0);
-		
-	retval|=gpio_unexport(PIN_SCLK);
-	retval|=gpio_unexport(PIN_MOSI);
-	retval|=gpio_unexport(PIN_MISO);
 
 	return retval;
 }
-
-void spi_writebyte(unsigned char byte,int mode,int msbfirst)
-{
-	int cpol;
-	int cpol0;
-	int cpha;
-	int bits;
-
-	switch (mode)
-	{
-		case SPI_MODE0:	cpol=0;cpha=0;break;
-		case SPI_MODE1:	cpol=0;cpha=1;break;
-		case SPI_MODE2:	cpol=1;cpha=0;break;
-		case SPI_MODE3:	cpol=1;cpha=1;break;
-	}
-	cpol0=cpol;
-	gpio_write(PIN_SCLK,cpol);
-	if (!cpha)
-	{
-		cpol=1-cpol;	// when CPHA=1, the new value is being sampled at the first clock edge
-		SPI_DELAY;
-	}
-	for (bits=0;bits<8;bits++)
-	{
-		int bit;
-		if (msbfirst==SPI_MSBFIRST)
-		{
-			bit=(byte>>7)&1;
-			byte<<=1;
-		} else {
-			bit=(byte)&1;
-			byte>>=1;
-		}
-		gpio_write(PIN_MOSI,bit);	// set the value	
-		gpio_write(PIN_SCLK,cpol);	// 1st clock edge
-		cpol=1-cpol;
-		SPI_DELAY;		
-		gpio_write(PIN_SCLK,cpol);	// 2nd clock edge
-		cpol=1-cpol;
-		SPI_DELAY;
-	}
-	gpio_write(PIN_SCLK,cpol0);		// make sure that the SPI clk is the same as before
-}
-void oled_reset()
-{
-	gpio_write(PIN_DC,0);		
-	gpio_write(PIN_RST,1);
-	DELAY_MS(200);
-	gpio_write(PIN_RST,0);
-	DELAY_MS(200);
-	gpio_write(PIN_RST,1);
-	DELAY_MS(200);
-}
-void oled_init()
-{
-	const unsigned char oled_commands[]={
-		0xae,0x02,0x10,0x40, 0x81,0xa0,0xc0,0xa6,	// turn off oled panel, set low column addr, set high column addr, set start line, set contrast control register,   set SEG/Column Mapping, Set COM/ROW scan direction, set normal display
-		0xa8,0x3f,0xd3,0x00, 0xd5,0x80,0xd9,0xf1,	// set multiplex ration 1:64, 1/64 duty, set display offset, not offset, set display clock, set divide clock as 100frames/sec, set pre-charge period, set pre-chare as 15 clocks & discarge as 1 clock
-		0xda,0x12,0xdb,0x40, 0x20,0x02,0xa4,0xa6,	// set com pins hardare, ???, set vcomh, set vcom deselect level, set page addr mode, ???, disable entire display on, disable inverse display on, 
-		0xaf	// turn on oled panel
-	};
-	int i;
-	gpio_write(PIN_DC,0);			
-	for (i=0;i<sizeof(oled_commands);i++)
-	{
-		spi_writebyte(oled_commands[i],SPI_MODE0,SPI_MSBFIRST);	
-	}
-}
-void oled_draw(unsigned char* bitmap)
-{
-	#define	CANVAS_WIDTH	128
-	#define	CANVAS_PAGES	8	
-	unsigned char canvas[CANVAS_WIDTH*CANVAS_PAGES];
-	int i;
-	for (i=0;i<CANVAS_WIDTH*CANVAS_PAGES;i++)
-	{
-		// each byte in the canvas represents a column of 8 bits from the bitmap
-		// 0000
-		// 1111
-		// 2222
-		// 3333
-		// 4444
-		// ...
-	
-		int j;
-		unsigned char byte;
-		int x,y;
-		byte=0;
-		x=i%BITMAP_WIDTH;
-		y=(i/BITMAP_WIDTH)*8;
-		for (j=0;j<8;j++)
-		{
-			int bit;
-			bit=bitmap[x+(y+j)*BITMAP_WIDTH]?0x80:0x00;
-			byte>>=1;
-			byte|=bit;
-		}
-		canvas[i]=byte;
-	}
-
-	for (i=0;i<CANVAS_PAGES;i++)
-	{
-		int j;
-		gpio_write(PIN_DC,0);			// write command
-		spi_writebyte(0xb0+i,SPI_MODE0,SPI_MSBFIRST);	// set page address
-		spi_writebyte(0x02,SPI_MODE0,SPI_MSBFIRST);	// set low column address
-		spi_writebyte(0x10,SPI_MODE0,SPI_MSBFIRST);	// set high column address
-		gpio_write(PIN_DC,1);			// write data
-		for (j=0;j<CANVAS_WIDTH;j++)
-		{
-			spi_writebyte(canvas[i*CANVAS_WIDTH+j],SPI_MODE0,SPI_MSBFIRST);
-		}
-	}
-}
-
 
 int sh1106_up()
 {
 	int retval;
 	retval=RETVAL_OK;
 	retval|=gpio_pins_up();
-	// spi mode 0
-	// spi master
-	// spi clock div 2
-	// spi msbfirst
-
-	// ?? tell the device it should take orders from SPI??
-	retval|=gpio_write(PIN_BL,1);
-	retval|=gpio_write(PIN_CS,0);
-	
-	if (retval==RETVAL_OK)
-	{	
-		oled_reset();
-		oled_init();
-	}
 	return retval;
 }
 int sh1106_down()
@@ -454,39 +316,35 @@ int sh1106_down()
 }
 void graceFulExit(int signal_number)
 {
-	printf("shutting down display...\n");
+	printf("shutting down ...\n");
 	sh1106_down();
 	exit(0);
 }
 int main(int argc,char** argv)
 {
-	unsigned char bitmap[BITMAP_WIDTH*BITMAP_HEIGHT]={0};
-	unsigned char bitmap2[BITMAP_WIDTH*BITMAP_HEIGHT]={0};
-	int i;
-	
+	char *names[8]={"LEFT","UP","FIRE","DOWN","RIGHT","KEY1","KEY2","KEY3"};
+	int pins[8]={PIN_LEFT,PIN_UP,PIN_FIRE,PIN_DOWN,PIN_RIGHT,PIN_KEY1,PIN_KEY2,PIN_KEY3};
+	int lastval[8]={0};
 	signal(SIGINT, graceFulExit);
 	if (sh1106_up())
 	{
-		fprintf(stderr,"unable to start up display. sorry");
+		fprintf(stderr,"unable to start up pins. sorry.\n");
 		return 1;
 	}
-	for (i=0;i<BITMAP_WIDTH*BITMAP_HEIGHT;i++)
+	while (1)
 	{
-		if ((i%10)<5) bitmap[i]=1;else bitmap[i]=0;	
-	}
-	for (i=0;i<BITMAP_HEIGHT;i++)
-	{
-		bitmap2[i+i*BITMAP_WIDTH]=1;
-	}
-	// draw the two bitmaps, one after the other
-	for (i=0;i<10;i++)
-	{
-		oled_draw(bitmap);
-		printf("%d\n",i);
-		oled_draw(bitmap2);
-	}
-	printf("press Enter to quit\n");
-	fgets(bitmap,sizeof(bitmap),stdin);	
+		int i;
+		for (i=0;i<8;i++) 
+		{
+			int val;
+			gpio_read(pins[i],&val);
+			if (val!=lastval[i])
+			{
+				printf("%8s %d->%d\n",names[i],lastval[i],val);
+			}
+			lastval[i]=val;
+		}
+	}	
 	graceFulExit(0);
 
 	return 0;	
