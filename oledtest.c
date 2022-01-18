@@ -60,25 +60,25 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 const short physicalmapping[41]={
 	0,	// placeholder. there is no PIN0
 	 -1, -1,// PIN1 =3.3V DC, PIN2 =5V DC
-	 -1, -1,
-	 -1, -1,
+	 -1, -1,// 3,4
+	 -1, -1,// 5,6
 	216, -1, //PIN7 = AUDIO_MCLK
-	 -1, -1,
+	 -1, -1, //9,10
 	 50, 79, //PIN11=UART_2_RTS,PIN12=I2S_4_CLK
-	 14, -1, 
-	194,232,
-	 -1, 15,
-	 16, -1,
-	 17, 13,
-	 18, 19,
-	 -1, 20,
-	 -1, -1,
-	149, -1,
-	200,168,
-	 38, -1,
-	 76, 51,
-	 12, 77,
-	 -1, 78
+	 14, -1, //13,14
+	194,232, //15,16
+	 -1, 15, //17,18
+	 16, -1, //19,20
+	 17, 13, //21,22
+	 18, 19, //23,24
+	 -1, 20, //25,26
+	 -1, -1, //27,28
+	149, -1, //29,30
+	200,168, //31,32
+	 38, -1, //33,34
+	 76, 51, //35,36
+	 12, 77, //37,38
+	 -1, 78  //39,40
 };
 #elif 0
 #warning "This mapping is for the Banana Pi board."
@@ -106,7 +106,7 @@ const short physicalmapping[41]={
 	 86, -1, //37,38
 	 -1, -1  //39,40
 };
-#elif 1
+#elif 0
 #warning "This mapping is for the Raspberry Pi Zero W 1.1 board"
 // source: https://www.theengineeringprojects.com/wp-content/uploads/2021/03/raspberry-pi-zero-5.png
 // NOTE: GPIO16 was actually missing in the diagram.

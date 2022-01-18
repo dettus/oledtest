@@ -1,5 +1,5 @@
 # oledtest
-Waveshare SH1106 on a Jetson Nano 
+Waveshare SH1106 on a Jetson Nano , Banana Pi Zero, Raspberry Pi Zero
 
 
 # BACKGROUND
