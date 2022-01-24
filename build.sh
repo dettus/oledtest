@@ -18,4 +18,7 @@
 
 gcc -O3 -o oledtest.app oledtest.c
 gcc -O3 -o keytest.app keytest.c
-ls -l oledtest.app keytest.app
+gcc -O3 -o texttest.app texttest.c
+echo "please run them as root (Or use sudo)"
+ls -l oledtest.app keytest.app texttest.app
+

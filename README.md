@@ -15,12 +15,13 @@ is the result.
 Please have a look at the sourcecode. It is imperative that the GPIO numbering from the 
 (deprecated) sysfs is being reflected in the physicalmapping[] array. Thus, the first time you 
 try to compile it, it will fail. You need to configure lines 21-26. I am really really sorry.
-(Yes, both files. oledtest.c as well as keytest.c)
+(Yes, three files. oledtest.c and texttest.c as well as keytest.c)
 
 Once you have done this, please run
 
 gcc -O3 -o oledtest.app oledtest.c
 gcc -O3 -o keytest.app keytest.c
+gcc -O3 -o texttest.app texttest.c
 
 IF YOU HAVE A NEW BOARD, PLEASE DO NOT HESITATE TO SEND ME THE MAPPING.
 dettus@dettus.net, make sure to include "OLEDTEST" somewhere in the subject line.
@@ -29,6 +30,7 @@ dettus@dettus.net, make sure to include "OLEDTEST" somewhere in the subject line
 Just run sudo ./oledtest.app and watch the display. It should show you two alternating bitmaps.
 If it complains about a GPIO pin -1, your sysfs mapping does not work with the OLED hat. 
 Then you have to do some rewiring. You need to find 7 GPIO pins which are free. 
+
 
 Or run sudo ./keytest.app and press the buttons. 
 
