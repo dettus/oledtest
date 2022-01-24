@@ -17,6 +17,15 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
+// Configuration starts here
+//#define PATCHED_WIRING		// comment in if you did the EXACT SAME wiring as I did ;)
+//#define PINOUT_JETSONNANO		// comment in if you connected the SH1106 directly to a Jetson Nano
+//#define PINOUT_BANANAPI		// comment in if you connected the SH1106 directly to a Banana Pi Zero
+//#define PINOUT_RASPBERRYPI		// comment in if you connected the SH1106 directly to a Raspberry Pi (Zero)
+// Configuration ends here
+
+
 #include <stdlib.h>
 #include <signal.h>
 #include <stdio.h>
@@ -53,7 +62,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // the way I understand this is, that the physical pins are mapped into
 // the system memory. to accces those, there is some sort of memory
 // offset maybe
-#if 0
+#if defined(PINOUT_JETSONNANO)
 #warning "This mapping is for the Jetson Nano board."
 // Jetson Nano
 // source: https://maker.pro/nvidia-jetson/tutorial/how-to-use-gpio-pins-on-jetson-nano-developer-kit
@@ -80,7 +89,7 @@ const short physicalmapping[41]={
 	 12, 77, //37,38
 	 -1, 78  //39,40
 };
-#elif 0
+#elif defined(PINOUT_BANANAPI)
 #warning "This mapping is for the Banana Pi board."
 // source: https://wiki.fw-web.de/doku.php?id=en:bpi-r64:gpio
 const short physicalmapping[41]={
@@ -106,8 +115,8 @@ const short physicalmapping[41]={
 	 86, -1, //37,38
 	 -1, -1  //39,40
 };
-#elif 0
-#warning "This mapping is for the Raspberry Pi Zero W 1.1 board"
+#elif defined(PINOUT_RASPBERRYPI) 
+#warning "This mapping is for the Raspberry Pi (Zero) board"
 // source: https://www.theengineeringprojects.com/wp-content/uploads/2021/03/raspberry-pi-zero-5.png
 // NOTE: GPIO16 was actually missing in the diagram.
 const short physicalmapping[41]={
@@ -134,11 +143,36 @@ const short physicalmapping[41]={
 	 -1, 21  //39,40
 };
 #else
-#error "Please have a look at the source code and select one of the mappings from the sysfs numbering to the physical pins"
+#error "The physical pins need to be mapped to the GPIO numbers. For some reason, those numbers are different for each board out there. So please have a look at the sourcecode, lines 21-26, and select the one that works best for you."
+const int physicalmapping[41]={0};
 #endif
 
 // this is the GPIO pinout for the waveshare OLED 1.3 SH1106 hat
 // source: https://www.waveshare.com/1.3inch-oled-hat.htm
+
+#ifdef	PATCHED_WIRING
+// Apparently, not every Key was mapped to a working GPIO pin. 
+// So I did some rewiring. This is a setup that works
+#define	PIN_LEFT	(physicalmapping[ 3])	// OLED pin 29
+#define	PIN_UP		(physicalmapping[ 5])	// OLED pin 31
+#define	PIN_FIRE	(physicalmapping[ 7])	// OLED pin 33
+#define	PIN_DOWN	(physicalmapping[29])	// OLED pin 35
+#define	PIN_RIGHT	(physicalmapping[31])	// OLED pin 37
+
+#define	PIN_KEY1	(physicalmapping[27])	// OLED pin 36
+#define	PIN_KEY2	(physicalmapping[24])	// OLED pin 38
+#define	PIN_KEY3	(physicalmapping[26])	// OLED pin 40
+
+#define	PIN_BL		(physicalmapping[16])	// OLED pin 12
+#define	PIN_DC		(physicalmapping[18])
+#define	PIN_RST		(physicalmapping[22])
+#define PIN_CS		(physicalmapping[28])	// OLED pin 24
+
+#define	PIN_MOSI	(physicalmapping[19])
+#define	PIN_MISO	(physicalmapping[21])
+#define	PIN_SCLK	(physicalmapping[23])
+
+#else
 #define	PIN_LEFT	(physicalmapping[29])
 #define	PIN_UP		(physicalmapping[31])
 #define	PIN_FIRE	(physicalmapping[33])
@@ -149,14 +183,15 @@ const short physicalmapping[41]={
 #define	PIN_KEY2	(physicalmapping[38])
 #define	PIN_KEY3	(physicalmapping[40])
 
-#define	PIN_BL	(physicalmapping[12])
-#define	PIN_DC	(physicalmapping[18])
-#define	PIN_RST	(physicalmapping[22])
-#define PIN_CS	(physicalmapping[24])
+#define	PIN_BL		(physicalmapping[12])
+#define	PIN_DC		(physicalmapping[18])
+#define	PIN_RST		(physicalmapping[22])
+#define PIN_CS		(physicalmapping[24])
 
 #define	PIN_MOSI	(physicalmapping[19])
 #define	PIN_MISO	(physicalmapping[21])
 #define	PIN_SCLK	(physicalmapping[23])
+#endif
 
 
 

@@ -14,11 +14,10 @@ is the result.
 # COMPILING
 Please have a look at the sourcecode. It is imperative that the GPIO numbering from the 
 (deprecated) sysfs is being reflected in the physicalmapping[] array. Thus, the first time you 
-try to compile it, it will fail. 
-Find the #if 0 line which reflects your board, or find the correct sysfs mapping for your board.
-Really really sorry, this is what happens when you become a maker.
+try to compile it, it will fail. You need to configure lines 21-26. I am really really sorry.
+(Yes, both files. oledtest.c as well as keytest.c)
 
-Once you changed one of the #if 0 to #if 1, you can compile it with
+Once you have done this, please run
 
 gcc -O3 -o oledtest.app oledtest.c
 gcc -O3 -o keytest.app keytest.c
